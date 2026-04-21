@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoTrade - Login & Signup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1a3e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(18, 25, 55, 0.8);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            width: 500px;
+            max-width: 100%;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .tabs {
+            display: flex;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 18px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #8a92b0;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: rgba(0,212,255,0.2);
+            color: #00d4ff;
+            border-bottom: 2px solid #00d4ff;
+        }
+
+        .form-container {
+            padding: 32px;
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #fff;
+            font-size: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #8a92b0;
+            font-weight: 500;
+            font-size: 13px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            font-size: 14px;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #00d4ff;
+        }
+
+        .input-group .hint {
+            font-size: 11px;
+            color: #5a6280;
+            margin-top: 5px;
+        }
+
+        .info-box {
+            background: rgba(0,212,255,0.1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .info-box p {
+            font-size: 12px;
+            color: #8a92b0;
+            margin: 5px 0;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,212,255,0.3);
+        }
+
+        .message {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 13px;
+            min-height: 40px;
+        }
+
+        .error { color: #ff4757; }
+        .success { color: #00e676; }
+
+        .pin-input {
+            letter-spacing: 5px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top-color: #00d4ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .loading-text {
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login')">Login</button>
+            <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <div class="form-container">
+            <div id="loginForm" class="form active">
+                <h2>Welcome Back</h2>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email">
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="Enter your password">
+                </div>
+                <button class="btn" onclick="handleLogin()">Login</button>
+                <div id="loginMessage" class="message"></div>
+            </div>
+
+            <div id="signupForm" class="form">
+                <h2>Create Account</h2>
+                
+                <div class="info-box">
+                    <p>🎮 <strong>One account, two modes:</strong></p>
+                    <p>• <strong>Demo Mode</strong> - Start with $10,000 virtual money</p>
+                    <p>• <strong>Real Mode</strong> - Switch anytime. Contact support to deposit</p>
+                </div>
+                
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" id="signupName" placeholder="Enter your full name">
+                </div>
+                
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="signupEmail" placeholder="Enter your email">
+                </div>
+                
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="signupPassword" placeholder="Create a password (min 6 characters)">
+                </div>
+                
+                <div class="input-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="signupConfirmPassword" placeholder="Confirm your password">
+                </div>
+                
+                <div class="input-group">
+                    <label>Withdraw PIN</label>
+                    <input type="password" id="withdrawPin" class="pin-input" maxlength="6" placeholder="••••••">
+                    <div class="hint">6-digit PIN for withdrawals and trades</div>
+                </div>
+                
+                <div class="input-group">
+                    <label>Confirm Withdraw PIN</label>
+                    <input type="password" id="confirmWithdrawPin" class="pin-input" maxlength="6" placeholder="••••••">
+                </div>
+                
+                <button class="btn" onclick="handleSignup()">Sign Up</button>
+                <div id="signupMessage" class="message"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">Creating your account...</div>
+    </div>
+
+    <script>
+        document.getElementById('withdrawPin')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+        });
+        document.getElementById('confirmWithdrawPin')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+        });
+
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+
+            if (tab === 'login') {
+                loginForm.classList.add('active');
+                signupForm.classList.remove('active');
+            } else {
+                loginForm.classList.remove('active');
+                signupForm.classList.add('active');
+            }
+
+            document.getElementById('loginMessage').innerHTML = '';
+            document.getElementById('signupMessage').innerHTML = '';
+        }
+
+        function showLoading(message) {
+            const overlay = document.getElementById('loadingOverlay');
+            const text = document.querySelector('.loading-text');
+            text.innerHTML = message || 'Processing...';
+            overlay.classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const messageDiv = document.getElementById('loginMessage');
+
+            if (!email || !password) {
+                messageDiv.innerHTML = '<span class="error">Please fill in all fields</span>';
+                return;
+            }
+
+            showLoading('Logging in...');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userEmail', email);
+                    localStorage.setItem('userName', data.user.name);
+                    messageDiv.innerHTML = '<span class="success">Login successful! Redirecting...</span>';
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1500);
+                } else {
+                    hideLoading();
+                    messageDiv.innerHTML = `<span class="error">${data.message || 'Login failed'}</span>`;
+                }
+            } catch (error) {
+                hideLoading();
+                messageDiv.innerHTML = '<span class="error">Cannot connect to server. Make sure server is running on port 5000</span>';
+            }
+        }
+
+        async function handleSignup() {
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('signupConfirmPassword').value;
+            const withdrawPin = document.getElementById('withdrawPin').value;
+            const confirmWithdrawPin = document.getElementById('confirmWithdrawPin').value;
+            const messageDiv = document.getElementById('signupMessage');
+
+            if (!name || !email || !password || !confirmPassword || !withdrawPin || !confirmWithdrawPin) {
+                messageDiv.innerHTML = '<span class="error">Please fill in all fields</span>';
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                messageDiv.innerHTML = '<span class="error">Passwords do not match</span>';
+                return;
+            }
+
+            if (password.length < 6) {
+                messageDiv.innerHTML = '<span class="error">Password must be at least 6 characters</span>';
+                return;
+            }
+
+            if (withdrawPin !== confirmWithdrawPin) {
+                messageDiv.innerHTML = '<span class="error">Withdraw PINs do not match</span>';
+                return;
+            }
+
+            if (withdrawPin.length !== 6) {
+                messageDiv.innerHTML = '<span class="error">Withdraw PIN must be exactly 6 digits</span>';
+                return;
+            }
+
+            if (!/^\d{6}$/.test(withdrawPin)) {
+                messageDiv.innerHTML = '<span class="error">Withdraw PIN must contain only numbers</span>';
+                return;
+            }
+
+            showLoading('Creating your account...');
+
+            try {
+                const signupResponse = await fetch('http://localhost:5000/api/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, withdrawPin })
+                });
+
+                const signupData = await signupResponse.json();
+
+                if (signupResponse.ok) {
+                    messageDiv.innerHTML = '<span class="success">Account created! Logging you in...</span>';
+                    
+                    const loginResponse = await fetch('http://localhost:5000/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const loginData = await loginResponse.json();
+
+                    if (loginResponse.ok) {
+                        localStorage.setItem('token', loginData.token);
+                        localStorage.setItem('userEmail', email);
+                        localStorage.setItem('userName', name);
+                        
+                        messageDiv.innerHTML = '<span class="success">Account created! Redirecting to dashboard...</span>';
+                        
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 1500);
+                    } else {
+                        hideLoading();
+                        messageDiv.innerHTML = '<span class="success">Account created! Please login manually.</span>';
+                        setTimeout(() => {
+                            switchTab('login');
+                            document.getElementById('loginEmail').value = email;
+                        }, 2000);
+                    }
+                } else {
+                    hideLoading();
+                    messageDiv.innerHTML = `<span class="error">${signupData.message || 'Signup failed'}</span>`;
+                }
+            } catch (error) {
+                hideLoading();
+                console.error('Signup error:', error);
+                messageDiv.innerHTML = '<span class="error">Cannot connect to server. Make sure server is running on port 5000</span>';
+            }
+        }
+
+        document.getElementById('loginPassword')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleLogin();
+        });
+        document.getElementById('confirmWithdrawPin')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') handleSignup();
+        });
+    </script>
+</body>
+</html>
